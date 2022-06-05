@@ -1,0 +1,37 @@
+---
+app: gatsby-starter-theme
+auto_deploy: true
+context: release-iewk7f
+domain: docs.hubofhubs.com
+repo_name: sixhobbits-ritza/gatsby starter theme
+hostnames:
+- gatsby-starter-theme: gatsby-starter-theme-gatsby-starter-theme-${env_id}.${domain}
+environment_templates:
+- name: ephemeral
+- name: permanent
+resources:
+  cpu:
+    limits: 1000m
+    requests: 100m
+  memory:
+    limits: 1Gi
+    requests: 100Mi
+  replicas: 1
+services:
+- name: gatsby-starter-theme
+  static: true
+  build_base: ''
+  build_command: gatsby build
+  build_output_directory: public
+workflows:
+- name: setup
+  order_from:
+  - services.all
+- name: teardown
+  parallelize:
+  - step: remove_environment
+    tasks:
+    - release.remove_environment
+- name: patch
+  order_from:
+  - services.all
